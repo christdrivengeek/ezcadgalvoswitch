@@ -1,7 +1,7 @@
 """
-EZ LightBurn Driver Switch v2.1
+EZ LightBurn Driver Switch v2.2
 Automatically switches between EZCAD2 and LightBurn drivers for fiber lasers
-Features: Auto-uninstall old driver, force install, configurable hardware ID
+Features: Auto-uninstall old driver, force install, configurable hardware ID, verification
 Author: William Sorensen (Christ Driven Geek)
 Target: Windows 10/11 (Requires Administrator)
 """
@@ -344,7 +344,7 @@ class EZLightBurnDriverSwitch:
         
         tk.Label(
             footer_frame,
-            text="v2.1 - Enhanced Driver Switching",
+            text="v2.2 - Enhanced Driver Switching",
             font=("Segoe UI", 8),
             fg="#888"
         ).pack(pady=(5, 0))
@@ -365,11 +365,16 @@ class EZLightBurnDriverSwitch:
         hw_id = self.config.get('hardware_id', DEFAULT_HARDWARE_ID)
         
         # PowerShell command to find the device and its service
+        # Prioritizes active (connected) devices
         ps_cmd = f"""
-        $device = Get-PnpDevice | Where-Object {{$_.HardwareID -like "*{hw_id}*"}}
-        if ($device) {{
-            $device.Status
-            $device | Select-Object -ExpandProperty Service
+        $devices = Get-PnpDevice | Where-Object {{$_.HardwareID -like "*{hw_id}*"}}
+        if ($devices) {{
+            # Prefer active device with Status 'OK'
+            $target = $devices | Where-Object {{$_.Status -eq 'OK'}} | Select-Object -First 1
+            if (-not $target) {{ $target = $devices | Select-Object -First 1 }}
+
+            $target.Status
+            $target | Select-Object -ExpandProperty Service
         }} else {{
             "Not Found"
         }}
@@ -469,11 +474,23 @@ class EZLightBurnDriverSwitch:
             hw_id = self.config.get('hardware_id', DEFAULT_HARDWARE_ID)
             uninstall_first = self.config.get('uninstall_first', True)
             
-            # Find device instance ID
+            # Identify which driver we want to end up with
+            if self.current_driver == "LightBurn":
+                target_path = self.config['ezcad_driver']
+                target_name = "EZCAD2"
+                expected_service_markers = ["lmc", "bjjcz"]
+            else:
+                target_path = self.config['lightburn_driver']
+                target_name = "LightBurn"
+                expected_service_markers = ["winusb", "usblmc"]
+
+            # Find device instance ID (Robust method)
             device_cmd = f"""
-            $device = Get-PnpDevice | Where-Object {{$_.HardwareID -like "*{hw_id}*"}}
-            if ($device) {{
-                $device.InstanceId
+            $devices = Get-PnpDevice | Where-Object {{$_.HardwareID -like "*{hw_id}*"}}
+            if ($devices) {{
+                $target = $devices | Where-Object {{$_.Status -eq 'OK'}} | Select-Object -First 1
+                if (-not $target) {{ $target = $devices | Select-Object -First 1 }}
+                $target.InstanceId
             }} else {{
                 "Not Found"
             }}
@@ -489,7 +506,7 @@ class EZLightBurnDriverSwitch:
                 )
                 device_instance = res.stdout.strip()
                 
-                if device_instance == "Not Found":
+                if device_instance == "Not Found" or not device_instance:
                     self.root.after(0, lambda: self._finish_swap(False, "Device not found. Ensure laser is connected."))
                     return
                     
@@ -536,13 +553,6 @@ class EZLightBurnDriverSwitch:
                     pass
             
             # Step 2: Install new driver
-            if self.current_driver == "LightBurn":
-                target_path = self.config['ezcad_driver']
-                target_name = "EZCAD2"
-            else:
-                target_path = self.config['lightburn_driver']
-                target_name = "LightBurn"
-            
             self.root.after(0, lambda: self.detail_lbl.config(text=f"Installing {target_name} driver..."))
             
             # Build pnputil command
@@ -559,14 +569,20 @@ class EZLightBurnDriverSwitch:
                     timeout=30
                 )
                 
-                # Check for success
+                # Check for success codes (0 = Success, 3010 = Reboot Required)
                 success = res.returncode == 0 or res.returncode == 3010
+                restart_required = res.returncode == 3010
                 log_msg = res.stdout if success else res.stderr
                 
                 if not success:
                     self.root.after(0, lambda: self._finish_swap(False, f"Driver installation failed:\n{log_msg}"))
                     return
                 
+                if restart_required:
+                    # If restart is required, we can't verify effectively without reboot
+                    self.root.after(0, lambda: self._finish_swap(True, f"{target_name} driver installed.\n\nIMPORTANT: Restart your computer to complete the update."))
+                    return
+
                 # Step 3: Scan for hardware changes
                 self.root.after(0, lambda: self.detail_lbl.config(text="Scanning for hardware changes..."))
                 
@@ -581,14 +597,47 @@ class EZLightBurnDriverSwitch:
                     pass
                 
                 # Wait for Windows to detect the new driver
-                time.sleep(2)
+                time.sleep(3)
+
+                # Step 4: Verification
+                self.root.after(0, lambda: self.detail_lbl.config(text="Verifying installation..."))
+
+                verify_cmd = f"""
+                $device = Get-PnpDevice -InstanceId "{device_instance}"
+                if ($device) {{
+                    $device | Select-Object -ExpandProperty Service
+                }} else {{
+                    "Not Found"
+                }}
+                """
+
+                verify_res = subprocess.run(
+                    ["powershell", "-Command", verify_cmd],
+                    capture_output=True,
+                    text=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                    timeout=10
+                )
+
+                current_service = verify_res.stdout.strip().lower()
+
+                # Check if the current service matches one of the expected markers
+                is_verified = any(marker in current_service for marker in expected_service_markers)
+
+                if is_verified:
+                    self.root.after(0, lambda: self._finish_swap(True, f"{target_name} driver installed and verified!"))
+                else:
+                    self.root.after(0, lambda: self._finish_swap(False,
+                        f"Driver was installed but device is still using '{current_service}'.\n\n"
+                        "Try:\n"
+                        "1. Restarting your computer\n"
+                        "2. Unplugging and replugging the laser\n"
+                        "3. Checking 'Force Install' in Settings"
+                    ))
                 
             except Exception as e:
                 self.root.after(0, lambda: self._finish_swap(False, f"Installation error: {str(e)}"))
                 return
-            
-            # Success!
-            self.root.after(0, lambda: self._finish_swap(True, f"{target_name} driver installed successfully!"))
             
         except Exception as e:
             self.root.after(0, lambda: self._finish_swap(False, f"Unexpected error: {str(e)}"))
@@ -608,11 +657,7 @@ class EZLightBurnDriverSwitch:
         else:
             messagebox.showerror(
                 "Driver Switch Failed",
-                f"{message}\n\n"
-                "Troubleshooting:\n"
-                "• Ensure you're running as Administrator\n"
-                "• Check laser USB connection\n"
-                "• Try disconnecting/reconnecting laser"
+                f"{message}"
             )
         
         # Re-detect driver status
