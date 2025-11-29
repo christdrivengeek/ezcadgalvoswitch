@@ -1,0 +1,93 @@
+================================================================================
+GALVOSWAP - PYINSTALLER BUILD COMMAND
+================================================================================
+
+RECOMMENDED COMMAND (Single-file, No Console):
+--------------------------------------------------------------------------------
+pyinstaller --onefile --noconsole --name=GalvoSwap GalvoSwap.py
+
+
+ALTERNATIVE COMMANDS:
+--------------------------------------------------------------------------------
+
+1. With Custom Icon:
+pyinstaller --onefile --noconsole --name=GalvoSwap --icon=icon.ico GalvoSwap.py
+
+2. Debug Build (with console for troubleshooting):
+pyinstaller --onefile --name=GalvoSwap GalvoSwap.py
+
+3. With UPX Compression (smaller file size):
+pyinstaller --onefile --noconsole --name=GalvoSwap --upx-dir=path/to/upx GalvoSwap.py
+
+
+COMMAND PARAMETERS EXPLAINED:
+--------------------------------------------------------------------------------
+--onefile       : Packages everything into a single .exe file
+--noconsole     : Hides the console window (GUI-only mode)
+--name=GalvoSwap: Sets the output filename to "GalvoSwap.exe"
+GalvoSwap.py    : The source Python file to compile
+
+
+BUILD STEPS:
+--------------------------------------------------------------------------------
+1. Install PyInstaller:
+   pip install pyinstaller
+
+2. Navigate to the project directory:
+   cd path/to/GalvoSwap
+
+3. Run the build command (see above)
+
+4. Find the executable:
+   dist/GalvoSwap.exe
+
+
+OUTPUT LOCATION:
+--------------------------------------------------------------------------------
+The compiled executable will be located at:
+dist/GalvoSwap.exe
+
+This file is completely standalone and can be distributed without Python.
+
+
+CLEAN BUILD (if needed):
+--------------------------------------------------------------------------------
+# Windows Command Prompt:
+rmdir /s /q build dist
+del GalvoSwap.spec
+pyinstaller --onefile --noconsole --name=GalvoSwap GalvoSwap.py
+
+# PowerShell:
+Remove-Item -Recurse -Force build, dist
+Remove-Item GalvoSwap.spec
+pyinstaller --onefile --noconsole --name=GalvoSwap GalvoSwap.py
+
+
+DISTRIBUTION:
+--------------------------------------------------------------------------------
+The GalvoSwap.exe file can be:
+- Copied to any Windows computer
+- Run without Python installed
+- Distributed to end users
+
+IMPORTANT: Users must run with Administrator privileges!
+
+
+TESTING:
+--------------------------------------------------------------------------------
+After building, test the executable:
+1. Copy GalvoSwap.exe to a test location
+2. Right-click and select "Run as Administrator"
+3. Complete the setup wizard
+4. Test driver detection and swapping
+
+
+TROUBLESHOOTING:
+--------------------------------------------------------------------------------
+- If "PyInstaller not found": pip install --upgrade pyinstaller
+- If antivirus flags the exe: This is a common false positive with PyInstaller
+- If the exe is too large: Use --upx-dir for compression
+- If modules are missing: Ensure all imports are from Python standard library
+
+
+================================================================================

@@ -1,0 +1,243 @@
+GalvoSwap Project Structure
+================================================================================
+
+PROJECT ROOT
+│
+├── GalvoSwap.py                    [MAIN APPLICATION - 500+ lines]
+│   └── Complete Python application with GUI, admin handling, and driver management
+│
+├── requirements.txt                [DEPENDENCIES]
+│   └── PyInstaller for building executable
+│
+├── driver_paths.json               [AUTO-GENERATED CONFIG]
+│   └── Created on first run, stores driver paths
+│
+├── README.md                       [PRIMARY DOCUMENTATION]
+│   ├── Overview and features
+│   ├── Installation instructions
+│   ├── Building the executable
+│   ├── First-time setup guide
+│   ├── Usage instructions
+│   ├── Technical details
+│   └── Troubleshooting
+│
+├── USAGE_GUIDE.md                  [DETAILED USER GUIDE]
+│   ├── Getting started
+│   ├── Step-by-step setup
+│   ├── Daily usage workflow
+│   ├── Troubleshooting section
+│   ├── FAQ
+│   └── Advanced tips
+│
+├── BUILD_INSTRUCTIONS.md           [BUILD DOCUMENTATION]
+│   ├── Quick build command
+│   ├── Detailed build process
+│   ├── Command options explained
+│   ├── Alternative build methods
+│   ├── Clean build process
+│   └── Advanced configuration
+│
+├── QUICK_START.md                  [QUICK REFERENCE]
+│   ├── End user quick start
+│   ├── Developer quick start
+│   ├── Common issues
+│   └── Help resources
+│
+├── PYINSTALLER_COMMAND.txt         [BUILD COMMANDS]
+│   ├── Recommended command
+│   ├── Alternative commands
+│   ├── Parameter explanations
+│   ├── Build steps
+│   └── Troubleshooting
+│
+├── PROJECT_SUMMARY.md              [PROJECT OVERVIEW]
+│   ├── Complete feature list
+│   ├── Technical specifications
+│   ├── Architecture overview
+│   ├── Testing checklist
+│   └── Project status
+│
+├── FILE_STRUCTURE.txt              [THIS FILE]
+│   └── Visual project structure
+│
+└── todo.md                         [DEVELOPMENT TRACKER]
+    └── Task completion checklist
+
+
+AFTER BUILDING WITH PYINSTALLER
+================================================================================
+
+PROJECT ROOT (after build)
+│
+├── [All files above]
+│
+├── build/                          [TEMPORARY BUILD FILES]
+│   └── Can be deleted after build
+│
+├── dist/                           [OUTPUT DIRECTORY]
+│   └── GalvoSwap.exe              ⭐ DISTRIBUTE THIS FILE
+│
+└── GalvoSwap.spec                  [PYINSTALLER SPEC]
+    └── Auto-generated, can be customized
+
+
+DISTRIBUTION PACKAGE
+================================================================================
+
+For End Users, provide:
+│
+├── GalvoSwap.exe                   [STANDALONE EXECUTABLE]
+│   └── No other files needed!
+│
+└── Optional Documentation:
+    ├── QUICK_START.md
+    └── USAGE_GUIDE.md
+
+
+FILE DESCRIPTIONS
+================================================================================
+
+CORE APPLICATION
+----------------
+GalvoSwap.py
+  - Main application file
+  - 500+ lines of Python code
+  - Complete GUI with tkinter
+  - Admin privilege handling
+  - Driver detection and swapping
+  - Configuration management
+  - Error handling throughout
+
+CONFIGURATION
+-------------
+requirements.txt
+  - Lists PyInstaller as build dependency
+  - No runtime dependencies (uses standard library)
+
+driver_paths.json
+  - Auto-generated on first run
+  - Stores paths to EZCAD2 and LightBurn drivers
+  - JSON format for easy editing
+  - Validated on load
+
+DOCUMENTATION
+-------------
+README.md (Primary Documentation)
+  - Comprehensive project overview
+  - Installation and setup
+  - Building instructions
+  - Usage guide
+  - Technical details
+  - Troubleshooting
+
+USAGE_GUIDE.md (User Manual)
+  - Detailed step-by-step instructions
+  - Screenshots placeholders
+  - Troubleshooting section
+  - FAQ
+  - Best practices
+  - Safety notes
+
+BUILD_INSTRUCTIONS.md (Developer Guide)
+  - Complete build process
+  - PyInstaller commands
+  - Alternative build options
+  - Clean build process
+  - Advanced configuration
+  - Distribution instructions
+
+QUICK_START.md (Quick Reference)
+  - Fast setup for end users
+  - Quick build for developers
+  - Common issues
+  - Help resources
+
+PYINSTALLER_COMMAND.txt (Build Reference)
+  - Ready-to-copy build commands
+  - Parameter explanations
+  - Troubleshooting tips
+  - Clean build commands
+
+PROJECT_SUMMARY.md (Overview)
+  - Complete feature list
+  - Technical specifications
+  - Architecture diagram
+  - Testing checklist
+  - Project status
+
+FILE_STRUCTURE.txt (This File)
+  - Visual project layout
+  - File descriptions
+  - Distribution guide
+
+
+KEY FEATURES BY FILE
+================================================================================
+
+GalvoSwap.py provides:
+  ✓ Admin privilege checking
+  ✓ Auto-restart with admin rights
+  ✓ Setup wizard (first run)
+  ✓ Driver auto-detection
+  ✓ One-click driver swapping
+  ✓ Configuration persistence
+  ✓ Modern GUI
+  ✓ Error handling
+  ✓ Status indicators
+
+Documentation provides:
+  ✓ Complete usage instructions
+  ✓ Build process documentation
+  ✓ Troubleshooting guides
+  ✓ Quick reference
+  ✓ Technical specifications
+  ✓ FAQ section
+
+
+WORKFLOW
+================================================================================
+
+DEVELOPMENT WORKFLOW:
+1. Edit GalvoSwap.py
+2. Test with: python GalvoSwap.py
+3. Build with: pyinstaller --onefile --noconsole --name=GalvoSwap GalvoSwap.py
+4. Test dist/GalvoSwap.exe
+5. Distribute GalvoSwap.exe
+
+END USER WORKFLOW:
+1. Download GalvoSwap.exe
+2. Run as Administrator
+3. Complete setup wizard
+4. Use to switch drivers
+
+
+IMPORTANT NOTES
+================================================================================
+
+✓ GalvoSwap.exe is completely standalone
+✓ No Python installation required for end users
+✓ No external dependencies needed
+✓ Configuration file created automatically
+✓ Must run with Administrator privileges
+✓ Works on Windows 7, 8, 10, 11
+
+
+SIZE ESTIMATES
+================================================================================
+
+Source Files:
+  GalvoSwap.py          : ~20 KB
+  Documentation         : ~100 KB
+  Total Source          : ~120 KB
+
+Built Executable:
+  GalvoSwap.exe         : ~8-12 MB (typical PyInstaller output)
+
+Runtime:
+  Memory Usage          : ~50 MB
+  Disk Space (config)   : <1 KB
+
+
+================================================================================
+END OF FILE STRUCTURE
+================================================================================

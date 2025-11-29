@@ -1,0 +1,4 @@
+# EZ LightBurn Driver Switch Requirements
+# For building the executable only
+
+pyinstaller>=6.0.0
